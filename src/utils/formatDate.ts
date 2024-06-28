@@ -12,7 +12,6 @@ export function formatDate(timestamp: number): string {
   yesterday.setHours(0, 0, 0, 0)
   tomorrow.setHours(0, 0, 0, 0)
   date.setHours(0, 0, 0, 0)
-  console.log(date.getTime(), yesterday.getTime())
 
   if (date.getDate() === today.getDate()) {
     return 'Today'

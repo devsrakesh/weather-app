@@ -10,12 +10,12 @@ const { fahrenheitToCelsius } = useTemperatureConverter()
 
 <template> 
     <div class="">
-    <div  class="border ">
+    <div  class="text-white ">
         <div  class="text-center ">
-          {{ formatTime( props.item.dt) }}
+          {{ (formatTime( props.item.dt) ).toUpperCase()}}
         </div>
         <div class="flex justify-center items-center ">
-            <img :src="`https://openweathermap.org/img/wn/${props.item?.weather[0].icon}.png`" class=""/>
+            <img :src="`https://openweathermap.org/img/wn/${props.item?.weather[0].icon}.png`" class="h-8"/>
             <div class=" text-sm ">{{fahrenheitToCelsius( props.item.temp ).toFixed()}} </div>
         </div>
     </div>
@@ -23,6 +23,3 @@ const { fahrenheitToCelsius } = useTemperatureConverter()
 
 </template>
 
-<style lang="postcss" scoped>
-    
-</style>

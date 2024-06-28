@@ -1,33 +1,49 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useWeatherStore } from '@/stores/weather'
 import DateSelect from '@/components/DateSelectComponent.vue'
 import { useDateFormatter } from '@/composables/useDateFormatter'
 import { useTemperatureConverter } from '@/composables/useTemperatureConverter'
 import { useTimeFormatter } from '@/composables/useTimeFormatter'
+import { useLocationStore } from '@/stores/location'
+import { useDateOptions } from '@/composables/useDateOptions'
 
-const weatherStore = useWeatherStore()
-const selectedDate = ref<number | null>(null)
-
-function handleDateChange(date: number) {
-  console.log(selectedDate.value, date)
-  selectedDate.value = date
-  setCurrentData(date)
-}
-
-const { CurrentData, setCurrentData, dateTimestamps, weatherData, loading, error } = weatherStore
 const { formatDate } = useDateFormatter()
 const { fahrenheitToCelsius } = useTemperatureConverter()
 const { formatTime } = useTimeFormatter()
+const weatherStore = useWeatherStore()
+
+const locationStore = useLocationStore();
+const { locations } = locationStore;
+
+
+const { dateTimestamps, weatherData, loading, error } = weatherStore
+const selectDate = ref<number | null>(null)
+
+
+
+
+
+function handleDateChange(date: number) {
+  console.log(selectDate.value, date)
+  selectDate.value = date
+}
+
+ const  setCurrentData= computed(()=>{
+    const data = weatherData&& weatherData?.daily.filter((day:any) => day.dt === selectDate.value)
+    return  data && data[0]
+ }) 
+  
+
 </script>
 <template>
   <div
-    class="border bg-yellow-100 h-[40vh] w-full rounded-2xl p-5 flex flex-col items-center text-orange-500"
+    class="border bg-[#fee1b7] min-h-[40vh] h-full md:h-full w-full rounded-2xl md:rounded-[60px] p-5 md:p-8 flex flex-col items-center text-[#fda679]"
   >
     <div v-if="loading">Loading...</div>
     <div v-if="error">{{ error.message }}</div>
+    <pre>{{ setCurrentData }}</pre>
     <div v-if="weatherData">
-      <!-- <pre>curre{{ CurrentData }}</pre> -->
       <div>
         <DateSelect
           v-if="dateTimestamps"
@@ -35,26 +51,31 @@ const { formatTime } = useTimeFormatter()
           @update:date="handleDateChange"
           class=""
         />
-        <div class="flex justify-center items-center">
+        <div class="flex justify-center items-center md:py-5">
           <img
-            :src="`https://openweathermap.org/img/wn/${CurrentData.weather[0].icon}.png`"
-            alt="https://openweathermap.org/img/wn/04n.png"
-            class="h-20"
+            :src="`https://openweathermap.org/img/wn/${weatherData.current.weather[0].icon}.png`"
+            alt="https://openweathermap.org"
+            class="h-20 md:h-44"
           />
-          <div class="text-orange-600 text-5xl">
-            {{ fahrenheitToCelsius(CurrentData.temp.max).toFixed(0) }}
+          <div class="text-[#fda679] text-6xl font-semibold md:text-9xl">
+            {{ fahrenheitToCelsius(weatherData.current.temp).toFixed(0) }}
           </div>
         </div>
-        <div class="text-center leading-8">{{ CurrentData.weather[0].description }}</div>
-        <div class="text-center leading-8">{{ weatherData.timezone }}</div>
-        <div class="text-center leading-8">{{ formatDate(weatherData.current.dt) }}</div>
-        <div class="flex justify-center items-center gap-2">
-          <div class="text-center leading-8">
-            Feels Like {{ fahrenheitToCelsius(weatherData.current.feels_like).toFixed(0) }}
+        <div class="flex flex-col md:gap-5">
+
+          <div class="text-center leading-8 text-sm md:text-4xl">{{ weatherData.current.weather[0].description }}</div>
+          <div class="text-center leading-8 md:text-2xl" >
+  {{ locations[0]?.address[1].long_name }},{{ locations[0]?.address[0].long_name }}
           </div>
-          |
-          <div class="text-center leading-8">
-            Sunset {{ formatTime(weatherData.current.sunset) }}
+          <div class="text-center leading-8 md:text-2xl">{{ formatDate(weatherData.current.dt) }}</div>
+          <div class="flex justify-center items-center gap-2 md:text-2xl">
+            <div class="text-center leading-8 md:text-2xl">
+              Feels Like {{ fahrenheitToCelsius(weatherData.current.feels_like).toFixed(0) }}
+            </div>
+            |
+            <div class="text-center leading-8 md:text-2xl">
+              Sunset {{ formatTime(weatherData.current.sunset) }}
+            </div>
           </div>
         </div>
       </div>

@@ -4,17 +4,26 @@ import HourlyItem from './HourlyItem.vue';
 import { computed } from 'vue';
 
 const weatherStore = useWeatherStore();
-const { weatherData, loading, error } = weatherStore;
+const { weatherData} = weatherStore;
 
-const alternateValues = computed(() => {
-  return weatherData?.hourly.slice(0,10); // Change condition for alternate selection
+const alternateValues1 = computed(() => {
+  return weatherData?.hourly.slice(0, 5);
+});
+
+const alternateValues2 = computed(() => {
+  return weatherData?.hourly.slice(5, 10);
 });
 </script>
 
 <template>
-    <div class="border bg-pink-100  w-full rounded-2xl p-5 items-center  text-orange-500 grid grid-cols-5 gap-4">
-
-        <HourlyItem v-for="item in alternateValues" :key="item.dt" :item="item" />
+    <div class=" bg-[#fee1b7] bg-opacity-70 bg-blend-exclusion  w-full rounded-2xl  md:rounded-[40px] p-2 md:p-8 items-center  text-orange-500  ">
+<div class="flex justify-between">
+  <HourlyItem v-for="item in alternateValues1" :key="item.dt" :item="item" />
+</div>
+<div class="w-full border border-white md:my-8 my-2"></div>
+<div class="flex justify-between">
+  <HourlyItem v-for="item in alternateValues2" :key="item.dt" :item="item" />
+</div>
 
     </div>
 </template>
