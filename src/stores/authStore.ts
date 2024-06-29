@@ -10,7 +10,12 @@ interface User {
 }
 
 export const useAuthStore = defineStore('auth', () => {
-  const user = ref<User | null>(null)
+  const user = ref<User>({
+    email: '',
+    _id: '',
+    accessToken: '',
+    refreshToken: ''
+  })
   const isAuthenticated = ref(false)
 
   const signup = async (email: string, password: string) => {
@@ -18,7 +23,11 @@ export const useAuthStore = defineStore('auth', () => {
       const response = await axios.post('/auth/register', { email, password })
       user.value = response.data.data
       isAuthenticated.value = true
-      cacheTokens(response.data.data.accessToken, response.data.data.refreshToken)
+      cacheTokens(
+        response.data.data.accessToken,
+        response.data.data.refreshToken,
+        response.data.data._id
+      )
     } catch (error) {
       console.error('Signup failed:', error)
       throw error
@@ -30,7 +39,11 @@ export const useAuthStore = defineStore('auth', () => {
       const response = await axios.post('/auth/login', { email, password })
       user.value = response.data.data
       isAuthenticated.value = true
-      cacheTokens(response.data.data.accessToken, response.data.data.refreshToken)
+      cacheTokens(
+        response.data.data.accessToken,
+        response.data.data.refreshToken,
+        response.data.data._id
+      )
     } catch (error) {
       console.error('Login failed:', error)
       throw error
@@ -40,36 +53,49 @@ export const useAuthStore = defineStore('auth', () => {
   const getRefreshToken = async () => {
     try {
       const refreshToken = localStorage.getItem('refreshToken')
-      console.log(refreshToken)
+      const userId = localStorage.getItem('userId')
 
-      if (!refreshToken || !user.value) {
+      console.log(refreshToken, userId)
+
+      if (refreshToken && userId) {
+        const response = await axios.post('/auth/refresh-token', {
+          userId: userId,
+          refreshToken: refreshToken
+        })
+
+        console.log('test', response.data.data)
+
+        user.value.accessToken = response.data.data.accessToken
+        user.value.refreshToken = response.data.data.accessToken
+
+        cacheTokens(response.data.data.accessToken, response.data.data.refreshToken, userId)
+      } else {
+        console.log('test', refreshToken, userId)
         throw new Error('No refresh token available')
       }
-
-      const response = await axios.post('/auth/refresh-token', {
-        userId: user.value._id,
-        refreshToken
-      })
-
-      user.value.accessToken = response.data.data.accessToken
-      user.value.refreshToken = response.data.data.refreshToken
-      cacheTokens(response.data.data.accessToken, response.data.data.refreshToken)
     } catch (error) {
       console.error('Token refresh failed:', error)
       throw error
     }
   }
 
-  const cacheTokens = (accessToken: string, refreshToken: string) => {
+  const cacheTokens = (accessToken: string, refreshToken: string, _id: string) => {
     localStorage.setItem('accessToken', accessToken)
     localStorage.setItem('refreshToken', refreshToken)
+    localStorage.setItem('userId', _id)
   }
 
   const clearAuth = () => {
-    user.value = null
+    user.value = {
+      email: '',
+      _id: '',
+      accessToken: '',
+      refreshToken: ''
+    }
     isAuthenticated.value = false
     localStorage.removeItem('accessToken')
     localStorage.removeItem('refreshToken')
+    localStorage.removeItem('userId')
   }
 
   const initializeAuth = async () => {
@@ -78,8 +104,8 @@ export const useAuthStore = defineStore('auth', () => {
 
     if (accessToken && refreshToken) {
       try {
-        await getRefreshToken()
         isAuthenticated.value = true
+        await getRefreshToken()
       } catch {
         console.log('t4st')
         clearAuth()

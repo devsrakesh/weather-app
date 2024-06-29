@@ -1,17 +1,16 @@
 <script lang="ts" setup>
-import { useWeatherStore } from '@/stores/weather';
 import HourlyItem from './HourlyItem.vue';
 import { computed } from 'vue';
 
-const weatherStore = useWeatherStore();
-const { weatherData} = weatherStore;
+const props = defineProps(['weatherData'])
+
 
 const alternateValues1 = computed(() => {
-  return weatherData?.hourly.slice(0, 5);
+  return props.weatherData?.hourly.slice(0, 5);
 });
 
 const alternateValues2 = computed(() => {
-  return weatherData?.hourly.slice(5, 10);
+  return props.weatherData?.hourly.slice(5, 10);
 });
 </script>
 

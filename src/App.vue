@@ -9,7 +9,7 @@ import { RouterLink, RouterView } from 'vue-router'
 
   <main class=" w-screen h-screen p-0 m-0 box-border bg-bg-image md:bg-bg-image-lg bg-cover">
       <header class=" bg-white bg-opacity-30 p-2 flex justify-between ">
-        <div class="text-xl p-2 text-purple-300">Weather App</div>
+        <div class="text-xl p-2 text-purple-300"><RouterLink to="/">Weather App</RouterLink></div>
       <nav class=" flex gap-3 text-xl">
         <!-- <RouterLink to="/">Home</RouterLink>
         <RouterLink to="/about">About</RouterLink> -->
