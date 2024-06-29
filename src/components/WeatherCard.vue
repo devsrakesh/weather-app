@@ -43,7 +43,7 @@ function handleDateChange(date: number) {
         />
         <div class="flex justify-center items-center md:py-5">
           <img
-            :src="`https://openweathermap.org/img/wn/${setCurrentData.weather[0].icon}.png`"
+            :src="`https://openweathermap.org/img/wn/${setCurrentData?.weather[0].icon}.png`"
             alt="Weather Icon"
             class="h-20 md:h-44"
           />
@@ -52,9 +52,9 @@ function handleDateChange(date: number) {
           </div>
         </div>
         <div class="flex flex-col md:gap-5">
-          <div class="text-center leading-8 text-sm md:text-4xl">{{ setCurrentData.weather[0].main }}</div>
+          <div class="text-center leading-8 text-sm md:text-4xl">{{ setCurrentData?.weather[0].main }}</div>
           <div class="text-center leading-8 md:text-2xl">
-            {{ props.locations[0]?.address[1].long_name }}, {{ props.locations[0]?.address[0].long_name }}
+            {{ props.locations[0]?.address[1].long_name }}, {{props.locations[0]?.address[2].long_name|| props.locations[0]?.address[3].long_name }}
           </div>
           <div class="text-center leading-8 md:text-2xl">{{ formatDate(props.weatherData.current.dt) }}</div>
           <div class="flex justify-center items-center gap-2 md:text-2xl">

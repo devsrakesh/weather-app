@@ -12,19 +12,12 @@ const { coords } = useGeolocation();
 const weatherStore = useWeatherStore();
 const apiKey = '68e1c727fbe7ac2718cc25cc2989191b'
 const locationStore = useLocationStore();
-const { locations,searchLocationsByCoordinates } = locationStore;
-
-const fetchWeatherAndLocation = () => {
-  if (coords.value?.latitude<Infinity && coords.value?.longitude<Infinity) {
-    weatherStore.fetchWeather(coords.value.latitude, coords.value.longitude, apiKey);
-    searchLocationsByCoordinates(coords.value.latitude, coords.value.longitude);
-  }
-};
 
 watch(coords, (newCoords) => {
   if (newCoords?.latitude && newCoords?.longitude) {
-    fetchWeatherAndLocation();
-  }
+    weatherStore.fetchWeather(coords.value.latitude, coords.value.longitude, apiKey);
+    locationStore.searchLocationsByCoordinates(coords.value.latitude, coords.value.longitude);
+}
 }, { immediate: true });
 
 
@@ -34,7 +27,7 @@ watch(coords, (newCoords) => {
 <template>
   <main>
     <div class="w-full h-full px-8 md:p-20 flex flex-col md:flex-row gap-8 text-white pt-4">
-      <WeatherCard :selectedDate="selectedDate"  :weatherData="weatherStore.weatherData" :dateTimestamps="weatherStore.dateTimestamps" :loading="weatherStore.loading" :locations="locations"/>
+      <WeatherCard :selectedDate="selectedDate"  :weatherData="weatherStore.weatherData" :dateTimestamps="weatherStore.dateTimestamps" :loading="weatherStore.loading" :locations="locationStore.locations"/>
       <div class="md:pr-32">
         <HourlyCard :weatherData="weatherStore.weatherData" :dateTimestamps="weatherStore.dateTimestamps" :loading="weatherStore.loading" />
         <div>
